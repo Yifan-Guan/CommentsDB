@@ -18,6 +18,7 @@ PRIMARY KEY(`evaluation_scale_id`)
 CREATE TABLE IF NOT EXISTS `chapters` (
 `chapter_id` BIGINT UNSIGNED AUTO_INCREMENT,
 `chapter_name` TINYTEXT,
+`chapter_volume` TINYTEXT,
 `chapter_url` TINYTEXT,
 PRIMARY KEY(`chapter_id`)
 ) DEFAULT CHARSET=`utf8mb4`;
@@ -57,7 +58,7 @@ FOREIGN KEY(`view_book_comment_id`) REFERENCES book_comments(`book_comment_id`) 
 FOREIGN KEY(`view_chapter_id`) REFERENCES chapters(`chapter_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) DEFAULT CHARSET=`utf8mb4`;
 
-CREATE TABLE IF NOT EXISTS `analysises` (
+CREATE TABLE IF NOT EXISTS `analyses` (
 `analysis_comment_id` BIGINT UNSIGNED,
 `analysis_scale_id` SMALLINT UNSIGNED,
 `analysis_result` TEXT,

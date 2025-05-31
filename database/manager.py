@@ -48,8 +48,16 @@ class DBManager:
         else:
             return self.db_cursor.fetchall()
 
-    def delete_chapter(self, chapter_id):
-        pass
+    def delete_comment(self, comment_id):
+        instruction = """
+        START TRANSACTION;
+        DELETE FROM analyses WHERE analysis_comment_id = {comment_id};
+        DELETE FROM views WHERE view_book_comment_id = {comment_id};
+        DELETE FROM book_comments WHERE book_comment_id = {comment_id};
+        COMMIT;
+        """.format(comment_id = comment_id)
+        self.db_cursor.execute(instruction)
+        return self.db_cursor.fetchall()
 
 if __name__ == "__main__":
     m = DBManager()
@@ -66,4 +74,5 @@ if __name__ == "__main__":
     comments = m.get_table_content("book_comments")
     for c in comments:
         print(c)
+    results = m.delete_comment(1001)
     m.close_connect()
