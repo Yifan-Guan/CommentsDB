@@ -84,3 +84,24 @@ FOREIGN KEY(`bi_book_id`) REFERENCES books(`book_id`) ON DELETE CASCADE ON UPDAT
 FOREIGN KEY(`bi_author_id`) REFERENCES authors(`author_id`) ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY(`bi_platform_id`) REFERENCES book_platforms(`book_platform_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) DEFAULT CHARSET=`utf8mb4`;
+
+CREATE TABLE IF NOT EXISTS `statistics` (
+`statistic_id` TINYINT UNSIGNED AUTO_INCREMENT,
+`statistic_name` TINYTEXT,
+`statistic_number_value` BIGINT UNSIGNED,
+`statistic_text_value` TINYTEXT,
+PRIMARY KEY(`statistic_id`)
+) DEFAULT CHARSET=`utf8mb4`;
+INSERT INTO `statistics` (
+`statistic_id`,
+`statistic_name`,
+`statistic_number_value`,
+`statistic_text_value`)
+VALUES 
+(1, "Numbers of book comments", 0, ""),
+(2, "Numbers of books", 0, ""),
+(3, "Numbers of authors", 0, "");
+
+CREATE TRIGGER `comment_count_trigger` AFTER INSERT ON `book_comments` FOR EACH ROW
+UPDATE `statistics` SET 	`statistic_number_value` = `statistic_number_value` + 1 
+WHERE `statistic_id` = 1;

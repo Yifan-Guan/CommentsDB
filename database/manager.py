@@ -49,15 +49,54 @@ class DBManager:
             return self.db_cursor.fetchall()
 
     def delete_comment(self, comment_id):
-        instruction = """
-        START TRANSACTION;
-        DELETE FROM analyses WHERE analysis_comment_id = {comment_id};
-        DELETE FROM views WHERE view_book_comment_id = {comment_id};
-        DELETE FROM book_comments WHERE book_comment_id = {comment_id};
-        COMMIT;
-        """.format(comment_id = comment_id)
-        self.db_cursor.execute(instruction)
-        return self.db_cursor.fetchall()
+        if not self.connected:
+            return False
+        try:
+            instruction = """
+            START TRANSACTION;
+            DELETE FROM analyses WHERE analysis_comment_id = {comment_id};
+            DELETE FROM views WHERE view_book_comment_id = {comment_id};
+            DELETE FROM book_comments WHERE book_comment_id = {comment_id};
+            COMMIT;
+            """.format(comment_id = comment_id)
+            self.db_cursor.execute(instruction)
+        except Exception as e:
+            print(repr(e))
+            return False
+        else:
+            return True
+
+    def insert_comment(self, content, recommend_degree, comment_id=None):
+        if not self.connected:
+            return False
+        if comment_id is None:
+            instruction = """
+            INSERT INTO book_comments (
+            recommendation_degree,
+            book_comment_content
+            )
+            VALUES 
+            ({r_d}, "{content}");
+            """.format(r_d = recommend_degree, content = content)
+        else:
+            instruction = """
+            INSERT INTO book_comments (
+            book_comment_id,
+            recommendation_degree,
+            book_comment_content
+            )
+            VALUES 
+            ({id}, {r_d}, "{content}");
+            """.format(id = comment_id, r_d = recommend_degree, content = content)
+        try:
+            self.db_cursor.execute(instruction)
+            self.db_connect.commit()
+        except Exception as e:
+            print("Insert error " + repr(e))
+            return False
+        else:
+            return True
+
 
 if __name__ == "__main__":
     m = DBManager()
@@ -74,5 +113,6 @@ if __name__ == "__main__":
     comments = m.get_table_content("book_comments")
     for c in comments:
         print(c)
-    results = m.delete_comment(1001)
+    ## m.delete_comment(1001)
+    m.insert_comment("insert test", 0, 2001)
     m.close_connect()
