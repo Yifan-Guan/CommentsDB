@@ -61,7 +61,7 @@ class DBManager:
             """.format(comment_id = comment_id)
             self.db_cursor.execute(instruction)
         except Exception as e:
-            print(repr(e))
+            print("Delete comment error " + repr(e))
             return False
         else:
             return True
@@ -92,10 +92,41 @@ class DBManager:
             self.db_cursor.execute(instruction)
             self.db_connect.commit()
         except Exception as e:
-            print("Insert error " + repr(e))
+            print("Insert comment error " + str(e))
             return False
         else:
             return True
+
+    def update_author_information(self, u_id, u_name, u_introduction):
+        if not self.connected:
+            return False
+        instruction = """
+        call update_author_information({u_id}, "{u_name}", "{u_introduction}");
+        """.format(u_id = u_id, u_name = u_name, u_introduction = u_introduction)
+        try:
+            self.db_cursor.execute(instruction)
+            self.db_connect.commit()
+        except Exception as e:
+            print("Author update error " + repr(e))
+            return False
+        else:
+            return True
+
+    def get_complete_book_information(self, book_name):
+        if not self.connected:
+            return tuple()
+        instruction = """
+        select * from complete_book_information where book_name = "{book_name}";
+        """.format(book_name = book_name)
+        result = tuple()
+        try:
+            self.db_cursor.execute(instruction)
+            result = self.db_cursor.fetchall()
+        except Exception as e:
+            print("Complete book information get error " + repr(e))
+        finally:
+            return result
+
 
 
 if __name__ == "__main__":
@@ -114,5 +145,9 @@ if __name__ == "__main__":
     for c in comments:
         print(c)
     ## m.delete_comment(1001)
-    m.insert_comment("insert test", 0, 2001)
+    ## m.insert_comment("insert test", 11, 5001)
+    ## m.update_author_information(6002, "Procedure test author name", "in")
+    book_information = m.get_complete_book_information("Test book name")
+    for bi in book_information:
+        print(bi)
     m.close_connect()

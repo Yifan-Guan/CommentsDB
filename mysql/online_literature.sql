@@ -10,23 +10,23 @@ PRIMARY KEY (`book_comment_id`)
 
 CREATE TABLE IF NOT EXISTS `evaluation_scales` (
 `evaluation_scale_id` SMALLINT UNSIGNED AUTO_INCREMENT,
-`evaluation_scale_name` TINYTEXT,
+`evaluation_scale_name` VARCHAR(100),
 `evaluation_scale_path` TINYTEXT,
 PRIMARY KEY(`evaluation_scale_id`)
 ) DEFAULT CHARSET=`utf8mb4`;
 
 CREATE TABLE IF NOT EXISTS `chapters` (
 `chapter_id` BIGINT UNSIGNED AUTO_INCREMENT,
-`chapter_name` TINYTEXT,
-`chapter_volume` TINYTEXT,
+`chapter_name` VARCHAR(100),
+`chapter_volume` VARCHAR(100),
 `chapter_url` TINYTEXT,
 PRIMARY KEY(`chapter_id`)
 ) DEFAULT CHARSET=`utf8mb4`;
 
 CREATE TABLE IF NOT EXISTS `books` (
 `book_id` INT UNSIGNED AUTO_INCREMENT,
-`book_name` TINYTEXT,
-`book_type` TINYTEXT,
+`book_name` VARCHAR(100),
+`book_type` VARCHAR(100),
 `book_introduction` TEXT,
 `book_url` TINYTEXT,
 PRIMARY KEY(`book_id`)
@@ -34,7 +34,7 @@ PRIMARY KEY(`book_id`)
 
 CREATE TABLE IF NOT EXISTS `authors` (
 `author_id` INT UNSIGNED AUTO_INCREMENT,
-`author_name` TINYTEXT,
+`author_name` VARCHAR(100),
 `author_introduction` TEXT,
 PRIMARY KEY(`author_id`)
 ) DEFAULT CHARSET=`utf8mb4`;
@@ -102,6 +102,37 @@ VALUES
 (2, "Numbers of books", 0, ""),
 (3, "Numbers of authors", 0, "");
 
-CREATE TRIGGER `comment_count_trigger` AFTER INSERT ON `book_comments` FOR EACH ROW
+CREATE TRIGGER `comment_after_insert_trigger` AFTER INSERT ON `book_comments` FOR EACH ROW
 UPDATE `statistics` SET 	`statistic_number_value` = `statistic_number_value` + 1 
 WHERE `statistic_id` = 1;
+
+DELIMITER ;;
+CREATE TRIGGER `comment_before_insert_trigger` BEFORE INSERT ON `book_comments` FOR EACH ROW
+BEGIN
+	DECLARE `error_msg` VARCHAR(100);
+	IF NEW.`recommendation_degree` > 10 THEN
+		SET `error_msg` = "The value of recommend degree is between 0 and 10.";
+		SIGNAL SQLSTATE "04061" SET MESSAGE_TEXT = `error_msg`;
+	END IF;
+END;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE `update_author_information`(
+IN `u_id` INT UNSIGNED,
+IN `u_name` VARCHAR(100),
+IN `u_introduction` TEXT)
+BEGIN
+	DECLARE `table_have` TINYINT;
+	DECLARE `old_id` INT UNSIGNED;
+    DECLARE `error_msg` VARCHAR(100);
+	SELECT COUNT(*) FROM `authors` WHERE `author_name` = `u_name` INTO `table_have`;
+	IF `table_have` = 0 THEN
+		SET `error_msg` = "No such author, insert first";
+        SIGNAL SQLSTATE "04062" SET MESSAGE_TEXT = `error_msg`;
+	ELSE
+		UPDATE `authors` SET `author_id` = `u_id`, `author_introduction` = `u_introduction`
+        WHERE `author_name` = `u_name`;
+	END IF;
+END;;
+DELIMITER ;

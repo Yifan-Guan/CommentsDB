@@ -6,7 +6,7 @@ INSERT INTO `book_comments` (
 `book_comment_content`
 )
 VALUES 
-(1001, 0, "Test comment : Deletion containing transaction application.");
+(4001, 0, "Test comment : Deletion containing transaction application.");
 
 INSERT INTO `views` (
 `view_book_comment_id`,
@@ -16,7 +16,7 @@ INSERT INTO `views` (
 `view_ip_address`
 )
 VALUES 
-(1001, 1, "2002-04-06", "77", "test ip");
+(4001, 1, "2002-04-06", "77", "test ip");
 
 INSERT INTO `analyses` (
 `analysis_comment_id`,
@@ -24,6 +24,6 @@ INSERT INTO `analyses` (
 `analysis_result`
 )
 VALUES 
-(1001, 1,
+(4001, 1,
 "Test for deletion containing transaction application."
 );
