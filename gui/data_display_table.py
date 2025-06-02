@@ -1,5 +1,6 @@
 import sys
 from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QHeaderView
 from database.manager import DBManager
 
@@ -12,6 +13,9 @@ class GDataDisplayTable(QWidget):
         self.headers = list()
         self.data = list()
 
+        self.label_font = QFont("SimHei", 14)
+        self.title_font = QFont("Roman times", 14)
+
         self.init_ui()
 
     def init_ui(self):
@@ -21,6 +25,7 @@ class GDataDisplayTable(QWidget):
         self.table.setSelectionBehavior(QTableWidget.SelectRows)  # 整行选中
         self.table.setSelectionMode(QTableWidget.SingleSelection)  # 单选
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setFont(self.label_font)
 
         layout = QVBoxLayout(self)
         layout.addWidget(self.table)
@@ -47,6 +52,7 @@ class GDataDisplayTable(QWidget):
         for row_idx, row_data in enumerate(self.data):
             for col_idx, value in enumerate(row_data):
                 item = QTableWidgetItem(str(value))
+                item.setFont(self.label_font)
                 self.table.setItem(row_idx, col_idx, item)
 
 if __name__ == "__main__":

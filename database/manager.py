@@ -144,10 +144,18 @@ if __name__ == "__main__":
     comments = m.get_table_content("book_comments")
     for c in comments:
         print(c)
+    print()
     ## m.delete_comment(4001)
     ## m.insert_comment("insert test", 11, 5001)
     ## m.update_author_information(6002, "Procedure test author name", "in")
     book_information = m.get_complete_book_information("Test book name")
     for bi in book_information:
         print(bi)
+        print(type(bi))
+    print(type(book_information))
+    print()
+
+    authors = m.get_table_content("authors")
+    for a in authors:
+        print(a)
     m.close_connect()
