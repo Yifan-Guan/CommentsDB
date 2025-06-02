@@ -10,7 +10,7 @@ class DBManager:
     def __del__(self):
         self.close_connect()
 
-    def connect(self, username, password, database, host = "localhost"):
+    def connect(self, username, password, database = "comments", host = "localhost"):
         try:
             self.db_connect = mysql.connector.connect(
                 host=host,
@@ -33,18 +33,18 @@ class DBManager:
 
     def get_tables(self):
         if not self.connected:
-            return tuple()
+            return list()
         self.db_cursor.execute("SHOW tables;")
         return self.db_cursor.fetchall()
 
     def get_table_content(self, name):
         if not self.connected:
-            return tuple()
+            return list()
         try:
             self.db_cursor.execute("SELECT * FROM {name}".format(name=name))
         except Exception as e:
             print(repr(e))
-            return tuple()
+            return list()
         else:
             return self.db_cursor.fetchall()
 
@@ -114,11 +114,11 @@ class DBManager:
 
     def get_complete_book_information(self, book_name):
         if not self.connected:
-            return tuple()
+            return list()
         instruction = """
         select * from complete_book_information where book_name = "{book_name}";
         """.format(book_name = book_name)
-        result = tuple()
+        result = list()
         try:
             self.db_cursor.execute(instruction)
             result = self.db_cursor.fetchall()
@@ -144,7 +144,7 @@ if __name__ == "__main__":
     comments = m.get_table_content("book_comments")
     for c in comments:
         print(c)
-    ## m.delete_comment(1001)
+    ## m.delete_comment(4001)
     ## m.insert_comment("insert test", 11, 5001)
     ## m.update_author_information(6002, "Procedure test author name", "in")
     book_information = m.get_complete_book_information("Test book name")

@@ -106,6 +106,27 @@ CREATE TRIGGER `comment_after_insert_trigger` AFTER INSERT ON `book_comments` FO
 UPDATE `statistics` SET 	`statistic_number_value` = `statistic_number_value` + 1 
 WHERE `statistic_id` = 1;
 
+CREATE TRIGGER `comment_after_delete_trigger` AFTER DELETE ON `book_comments` FOR EACH ROW
+UPDATE `statistics` SET 	`statistic_number_value` = `statistic_number_value` - 1 
+WHERE `statistic_id` = 1;
+
+CREATE TRIGGER `book_after_insert_trigger` AFTER INSERT ON `books` FOR EACH ROW
+UPDATE `statistics` SET 	`statistic_number_value` = `statistic_number_value` + 1 
+WHERE `statistic_id` = 2;
+
+CREATE TRIGGER `book_after_delete_trigger` AFTER DELETE ON `books` FOR EACH ROW
+UPDATE `statistics` SET 	`statistic_number_value` = `statistic_number_value` - 1 
+WHERE `statistic_id` = 2;
+
+CREATE TRIGGER `author_after_insert_trigger` AFTER INSERT ON `authors` FOR EACH ROW
+UPDATE `statistics` SET 	`statistic_number_value` = `statistic_number_value` + 1 
+WHERE `statistic_id` = 3;
+
+CREATE TRIGGER `author_after_delete_trigger` AFTER DELETE ON `authors` FOR EACH ROW
+UPDATE `statistics` SET 	`statistic_number_value` = `statistic_number_value` - 1 
+WHERE `statistic_id` = 3;
+
+
 DELIMITER ;;
 CREATE TRIGGER `comment_before_insert_trigger` BEFORE INSERT ON `book_comments` FOR EACH ROW
 BEGIN
@@ -136,3 +157,19 @@ BEGIN
 	END IF;
 END;;
 DELIMITER ;
+
+CREATE VIEW `complete_book_information` AS
+SELECT `book_id`, `book_name`, `book_type`, `author_name`, 
+`book_platform_name`, `book_introduction`, `book_url`
+FROM `books`, `authors`, `book_platforms`, `book_information`
+WHERE `books`.`book_id` = `book_information`.`bi_book_id`
+AND `book_information`.`bi_author_id` = `authors`.`author_id`
+AND `book_information`.`bi_platform_id` = `book_platforms`.`book_platform_id`;
+
+CREATE VIEW `complete_comment_information` AS
+SELECT `book_comment_id`, `view_create_time`, `view_reader_name`, `view_ip_address`, 
+`book_name`, `book_comment_content`
+FROM `book_comments`, `views`, `book_chapter`, `books`, `book_information`
+WHERE `book_comments`.`book_comment_id` = `views`.`view_book_comment_id`
+AND `views`.`view_chapter_id` = `book_chapter`.`bc_book_id`
+AND `book_chapter`.`bc_book_id` = `books`.`book_id`;

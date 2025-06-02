@@ -1,34 +1,94 @@
-from tkinter import ttk
-from tkinter import *
-from tkinter.ttk import *
+import sys
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import QSizePolicy, QMessageBox
+from gui.main_window import GMainWindow
 from database.manager import DBManager
-import tkinter as tk
 
-class WLogin:
 
+class GLogin(QMainWindow):
     def __init__(self, manager):
+        super().__init__()
+        self.main_window_ui = None
+        self.main_widget = QWidget()
         self.manager = manager
-        self.root = tk.Tk()
-        frm = ttk.Frame(self.root, padding=10)
-        frm.grid()
-        l1 = ttk.Label(frm, text="Hello world!")
-        l1.grid(column=0, row=0, columnspan=7)
-        button_style = ttk.Style()
-        button_style.configure("my.TButton", background="white", foreground="black")
-        b1 = ttk.Button(frm, text="quit", style="my.TButton", command=self.root.destroy)
-        b1.grid(column=2, row=1)
-        self.root.mainloop()
-        self.root.withdraw()
+        self.user_name = ""
+        self.user_password = ""
+        self.label_font = QFont("SimHei", 20)
+        self.title_font = QFont("Roman times", 40)
+        self.input_user_name = QLineEdit("comment_manager")
+        self.input_user_password = QLineEdit("123456")
+        self.button_login = QPushButton(" Log in ")
+        self.init_ui()
 
-    def show(self):
-        self.root.deiconify()
+    def init_ui(self):
+        self.setWindowTitle("Log in")
+        self.resize(600, 400)
 
-    def hide(self):
-        self.root.withdraw()
+        self.setCentralWidget(self.main_widget)
+        layout = QVBoxLayout()
+        self.main_widget.setLayout(layout)
+        label_title = QLabel("COMMENTS")
+        label_user_name = QLabel("Name:")
+        label_user_password = QLabel("Password:")
 
-    def quit(self):
-        self.root.destroy()
+        label_title.setFont(self.title_font)
+        label_user_name.setFont(self.label_font)
+        label_user_password.setFont(self.label_font)
+        self.input_user_name.setFont(self.label_font)
+        self.input_user_password.setFont(self.label_font)
+        self.button_login.setFont(self.label_font)
+
+        title_layout = QHBoxLayout()
+        title_layout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
+        title_layout.addWidget(label_title)
+        title_layout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
+        label_layout = QVBoxLayout()
+        label_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        label_layout.addWidget(label_user_name)
+        label_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        label_layout.addWidget(label_user_password)
+        label_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        input_layout = QVBoxLayout()
+        input_layout.addWidget(self.input_user_name)
+        input_layout.addWidget(self.input_user_password)
+        hint_layout = QHBoxLayout()
+        hint_layout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
+        hint_layout.addLayout(label_layout)
+        hint_layout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
+        hint_layout.addLayout(input_layout)
+        hint_layout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
+        button_layout = QHBoxLayout()
+        button_layout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
+        button_layout.addWidget(self.button_login)
+        button_layout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
+        layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        layout.addLayout(title_layout)
+        layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        layout.addLayout(hint_layout)
+        layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        layout.addLayout(button_layout)
+        layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+
+        self.button_login.clicked.connect(self.db_login)
+
+    def db_login(self):
+        self.user_name = self.input_user_name.text()
+        self.user_password = self.input_user_password.text()
+        self.manager.connect(self.user_name, self.user_password)
+        if self.manager.connected:
+            self.manager.close_connect()
+            self.main_window_ui = GMainWindow(self.user_name, self.user_password)
+            self.main_window_ui.show()
+            self.close()
+        else:
+            QMessageBox.critical(self, "Error", "DB connect failure!",
+                                 QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+
+
 
 if __name__ == "__main__":
-    l = WLogin(DBManager())
-    l.hide()
+    app = QApplication(sys.argv)
+    login = GLogin(DBManager())
+    login.show()
+    sys.exit(app.exec_())
