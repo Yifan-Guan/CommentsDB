@@ -29,7 +29,7 @@ class GMainWindow(QMainWindow):
         self.input_author_name = QLineEdit("Procedure test author name")
         self.input_author_introduction = QLineEdit("Procedure update test introduction")
 
-        self.input_book_name = QLineEdit("Test book name")
+        self.input_book_name = QLineEdit("吞噬星空")
 
         self.input_comment_id.setFont(self.label_font)
         self.input_comment_recommend_degree.setFont(self.label_font)
@@ -206,6 +206,7 @@ class GMainWindow(QMainWindow):
             QMessageBox.information(self, "Success", "Delete comment successfully",
                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             self.flush_comment_table()
+            self.flush_comment_information_table()
         else:
             QMessageBox.critical(self, "Error", "Delete comment error",
                                  QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
@@ -264,8 +265,7 @@ class GMainWindow(QMainWindow):
             book url: \t {url}
             """.format(id=bi[0], name=bi[1], type=bi[2], author=bi[3], platform=bi[4],
                        instruction=bi[5], url=bi[6])
-            QMessageBox.information(self, "Complete information for " + book_title, book_info,
-                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            QMessageBox.about(self, "Complete information for " + book_title, book_info)
             self.flush_book_table()
         else:
             QMessageBox.critical(self, "Error", "No such book",

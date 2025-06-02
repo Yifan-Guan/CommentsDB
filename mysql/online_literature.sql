@@ -167,7 +167,7 @@ AND `book_information`.`bi_author_id` = `authors`.`author_id`
 AND `book_information`.`bi_platform_id` = `book_platforms`.`book_platform_id`;
 
 CREATE VIEW `complete_comment_information` AS
-SELECT `book_comment_id`, `view_create_time`, `view_reader_name`, `view_ip_address`, 
+SELECT DISTINCT `book_comment_id`, `view_create_time`, `view_reader_name`, `view_ip_address`, 
 `book_name`, `book_comment_content`
 FROM `book_comments`, `views`, `book_chapter`, `books`, `book_information`
 WHERE `book_comments`.`book_comment_id` = `views`.`view_book_comment_id`
